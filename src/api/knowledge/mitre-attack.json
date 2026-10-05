@@ -1,0 +1,72 @@
+[
+  {
+    "id": "T1595",
+    "title": "Active Scanning",
+    "tactic": "Reconnaissance",
+    "content": "Adversaries may scan IP blocks, ports, and services to gather information for targeting. Nmap scans and SSDP amplification probes map to active scanning. Monitor unusual port sweeps, HTTP probes, and scanner user-agents.",
+    "keywords": ["scan", "nmap", "reconnaissance", "port scan", "probe", "ssdp"]
+  },
+  {
+    "id": "T1110",
+    "title": "Brute Force",
+    "tactic": "Credential Access",
+    "content": "Brute force attacks attempt to gain access via repeated authentication attempts, default credentials, or password spraying. Block repeated failed logins, enforce MFA, and alert on default credential usage against admin interfaces.",
+    "keywords": ["brute force", "default credential", "password", "login", "authentication"]
+  },
+  {
+    "id": "T1190",
+    "title": "Exploit Public-Facing Application",
+    "tactic": "Initial Access",
+    "content": "Attackers exploit vulnerabilities in internet-facing applications (web servers, VPN portals, CMS plugins). Patch exposed services, deploy WAF rules, and inspect HTTP traffic for exploit payloads and path traversal attempts.",
+    "keywords": ["exploit", "web application", "cve", "path traversal", "rce", "injection", "wordpress", "coldfusion"]
+  },
+  {
+    "id": "T1078",
+    "title": "Valid Accounts",
+    "tactic": "Defense Evasion",
+    "content": "Compromised or default valid accounts allow adversaries to blend in with normal activity. Rotate default passwords, disable unused accounts, and correlate authentication events with threat intelligence.",
+    "keywords": ["valid account", "default admin", "credential", "administrator"]
+  },
+  {
+    "id": "T1498",
+    "title": "Network Denial of Service",
+    "tactic": "Impact",
+    "content": "DoS and DDoS attacks degrade availability via traffic floods or amplification. Rate-limit UDP services, enable SYN cookies, and use upstream DDoS protection for public endpoints.",
+    "keywords": ["dos", "ddos", "denial of service", "flood", "amplification", "udp flood"]
+  },
+  {
+    "id": "T1557",
+    "title": "Adversary-in-the-Middle",
+    "tactic": "Credential Access",
+    "content": "MITM attacks intercept or manipulate network sessions. TCP stream anomalies, handshake replays, and one-directional protocol detection may indicate session manipulation or passive interception attempts.",
+    "keywords": ["mitm", "man in the middle", "handshake", "stream", "protocol"]
+  },
+  {
+    "id": "T1059",
+    "title": "Command and Scripting Interpreter",
+    "tactic": "Execution",
+    "content": "Command injection and OS command execution allow attackers to run arbitrary commands on servers. Sanitize inputs, disable shell execution in web apps, and block suspicious POST parameters.",
+    "keywords": ["command injection", "sql injection", "os command", "shell"]
+  },
+  {
+    "id": "T1071",
+    "title": "Application Layer Protocol",
+    "tactic": "Command and Control",
+    "content": "Adversaries use HTTP, DNS, and other application protocols for C2 and data exfiltration. Inspect outbound connections, block known malicious domains, and correlate beaconing behavior.",
+    "keywords": ["c2", "command and control", "http", "dns", "botnet", "beacon"]
+  },
+  {
+    "id": "T1566",
+    "title": "Phishing",
+    "tactic": "Initial Access",
+    "content": "Phishing delivers malicious links or attachments to steal credentials or deploy malware. Block known phishing domains, sandbox email attachments, and train users on suspicious URLs.",
+    "keywords": ["phishing", "malicious domain", "credential theft", "url"]
+  },
+  {
+    "id": "T1203",
+    "title": "Exploitation for Client Execution",
+    "tactic": "Execution",
+    "content": "Exploit kits and drive-by downloads target client applications. Keep browsers updated, enable exploit mitigation, and block traffic to known exploit kit infrastructure.",
+    "keywords": ["exploit kit", "malware", "drive-by", "client execution"]
+  }
+]

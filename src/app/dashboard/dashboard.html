@@ -1,0 +1,340 @@
+<div class="dashboard">
+  <header class="dashboard__header">
+    <div>
+      <p class="dashboard__eyebrow">Suricata EVE log analysis</p>
+      <h1>Network Security Dashboard</h1>
+      <p class="dashboard__hint">Click highlighted terms or chart segments for AI explanations</p>
+    </div>
+
+    <div class="dashboard__header-actions">
+      <button type="button" class="dashboard__agent-btn" (click)="openAgent('', 'ip')">
+        Ask Agent
+      </button>
+
+      @if (stats().firstTimestamp && stats().lastTimestamp) {
+        <div class="dashboard__range">
+          <span>Capture window</span>
+          <strong>{{ formatTimestamp(stats().firstTimestamp) }}</strong>
+          <span class="dashboard__range-separator">to</span>
+          <strong>{{ formatTimestamp(stats().lastTimestamp) }}</strong>
+        </div>
+      }
+    </div>
+  </header>
+
+  <div class="dashboard__layout">
+    <div class="dashboard__main">
+      @if (loading()) {
+        <div class="dashboard__loading">
+          <div class="dashboard__spinner"></div>
+          <p>Parsing EVE events… {{ progress() }}%</p>
+        </div>
+      }
+
+      @if (error()) {
+        <div class="dashboard__error">{{ error() }}</div>
+      }
+
+      @if (!loading() && !error()) {
+        <section class="dashboard__cards">
+          @for (card of summaryCards(); track card.label) {
+            <article class="stat-card" [style.--accent]="card.accent">
+              <button
+                type="button"
+                class="explain-chip"
+                (click)="openExplain(card.label, 'metric', { value: card.value })"
+              >
+                {{ card.label }}
+              </button>
+              <strong class="stat-card__value">{{ card.value | number }}</strong>
+            </article>
+          }
+        </section>
+
+        <section class="dashboard__charts">
+          <article class="panel panel--wide">
+            <h2>Alerts over time</h2>
+            <p class="panel__hint">Click a point to explain that day's alert volume</p>
+            <div class="panel__chart">
+              <canvas
+                baseChart
+                [type]="'line'"
+                [data]="alertsTimelineChart()"
+                [options]="lineOptions"
+                (chartClick)="onChartSegmentClick($event, stats().alertsTimeline, 'metric')"
+              ></canvas>
+            </div>
+          </article>
+
+          <article class="panel">
+            <h2>Events by type</h2>
+            <p class="panel__hint">Click a slice to explain an EVE event type</p>
+            <div class="panel__chart">
+              <canvas
+                baseChart
+                [type]="'doughnut'"
+                [data]="eventTypeChart()"
+                [options]="doughnutOptions"
+                (chartClick)="onChartSegmentClick($event, stats().eventTypes, 'event_type')"
+              ></canvas>
+            </div>
+          </article>
+
+          <article class="panel">
+            <h2>Attack categories</h2>
+            <p class="panel__hint">Click a bar to explain an attack category</p>
+            <div class="panel__chart">
+              <canvas
+                baseChart
+                [type]="'bar'"
+                [data]="categoryChart()"
+                [options]="barOptions"
+                (chartClick)="onChartSegmentClick($event, stats().alertCategories, 'category')"
+              ></canvas>
+            </div>
+          </article>
+
+          <article class="panel">
+            <h2>Alert severity</h2>
+            <p class="panel__hint">Click a bar to explain severity levels</p>
+            <div class="panel__chart">
+              <canvas
+                baseChart
+                [type]="'bar'"
+                [data]="severityChart()"
+                [options]="barOptions"
+                (chartClick)="onChartSegmentClick($event, stats().alertSeverities, 'severity')"
+              ></canvas>
+            </div>
+          </article>
+
+          <article class="panel">
+            <h2>Flow protocols</h2>
+            <p class="panel__hint">Click a bar to explain a protocol</p>
+            <div class="panel__chart">
+              <canvas
+                baseChart
+                [type]="'bar'"
+                [data]="protocolChart()"
+                [options]="barOptions"
+                (chartClick)="onChartSegmentClick($event, stats().protocols, 'protocol')"
+              ></canvas>
+            </div>
+          </article>
+        </section>
+
+        <section class="dashboard__tables">
+          <article class="panel">
+            <h2>Top alert signatures</h2>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Signature</th>
+                    <th>Count</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  @for (entry of stats().topSignatures; track entry.label) {
+                    <tr>
+                      <td>
+                        <button
+                          type="button"
+                          class="explain-chip"
+                          (click)="openExplain(entry.label, 'signature', { count: entry.count })"
+                        >
+                          {{ entry.label }}
+                        </button>
+                      </td>
+                      <td>{{ entry.count | number }}</td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            </div>
+          </article>
+
+          <article class="panel">
+            <h2>Top source / destination IPs</h2>
+            <div class="ip-grid">
+              <div>
+                <h3>Source IPs</h3>
+                <ul>
+                  @for (entry of stats().topSourceIps; track entry.label) {
+                    <li>
+                      <div class="ip-info">
+                        <button type="button" class="ip-link" (click)="openAgent(entry.label, 'ip')">
+                          {{ entry.label }}
+                        </button>
+                        <button
+                          type="button"
+                          class="ti-badge explain-badge"
+                          [ngClass]="getThreatBadgeClass(getThreatIntel(entry.label))"
+                          (click)="explainThreatIntel(entry.label, getThreatIntel(entry.label))"
+                        >
+                          {{ getThreatLabel(getThreatIntel(entry.label)) }}
+                        </button>
+                      </div>
+                      <strong>{{ entry.count | number }}</strong>
+                    </li>
+                  }
+                </ul>
+              </div>
+              <div>
+                <h3>Destination IPs</h3>
+                <ul>
+                  @for (entry of stats().topDestIps; track entry.label) {
+                    <li>
+                      <div class="ip-info">
+                        <button type="button" class="ip-link" (click)="openAgent(entry.label, 'ip')">
+                          {{ entry.label }}
+                        </button>
+                        <button
+                          type="button"
+                          class="ti-badge explain-badge"
+                          [ngClass]="getThreatBadgeClass(getThreatIntel(entry.label))"
+                          (click)="explainThreatIntel(entry.label, getThreatIntel(entry.label))"
+                        >
+                          {{ getThreatLabel(getThreatIntel(entry.label)) }}
+                        </button>
+                      </div>
+                      <strong>{{ entry.count | number }}</strong>
+                    </li>
+                  }
+                </ul>
+              </div>
+            </div>
+          </article>
+        </section>
+
+        <section class="panel panel--wide">
+          <h2>Recent alerts</h2>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Timestamp</th>
+                  <th>Signature</th>
+                  <th>Attack category</th>
+                  <th>Severity</th>
+                  <th>Source</th>
+                  <th>Destination</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (alert of stats().recentAlerts; track alert.timestamp + alert.signature) {
+                  <tr>
+                    <td>{{ formatTimestamp(alert.timestamp) }}</td>
+                    <td>
+                      <button
+                        type="button"
+                        class="explain-chip"
+                        (click)="openExplain(alert.signature, 'signature', {
+                          count: 1,
+                          category: alert.category,
+                          severity: severityLabel(alert.severity),
+                          srcIp: alert.srcIp,
+                          destIp: alert.destIp
+                        })"
+                      >
+                        {{ alert.signature }}
+                      </button>
+                    </td>
+                    <td>
+                      <button
+                        type="button"
+                        class="explain-chip"
+                        (click)="openExplain(alert.category, 'category', {
+                          signature: alert.signature,
+                          severity: severityLabel(alert.severity)
+                        })"
+                      >
+                        {{ alert.category }}
+                      </button>
+                    </td>
+                    <td>
+                      <button
+                        type="button"
+                        class="severity-badge explain-badge"
+                        [attr.data-level]="alert.severity"
+                        (click)="openExplain(severityLabel(alert.severity), 'severity', {
+                          level: alert.severity,
+                          signature: alert.signature,
+                          category: alert.category
+                        })"
+                      >
+                        {{ severityLabel(alert.severity) }}
+                      </button>
+                    </td>
+                    <td>
+                      <div class="ip-info">
+                        <button type="button" class="ip-link" (click)="openAgent(alert.srcIp, 'ip')">
+                          {{ alert.srcIp }}
+                        </button>
+                        <button
+                          type="button"
+                          class="ti-badge explain-badge"
+                          [ngClass]="getThreatBadgeClass(getThreatIntel(alert.srcIp))"
+                          (click)="explainThreatIntel(alert.srcIp, getThreatIntel(alert.srcIp))"
+                        >
+                          {{ getThreatLabel(getThreatIntel(alert.srcIp)) }}
+                        </button>
+                      </div>
+                    </td>
+                    <td>
+                      <div class="ip-info">
+                        <button type="button" class="ip-link" (click)="openAgent(alert.destIp, 'ip')">
+                          {{ alert.destIp }}
+                        </button>
+                        <button
+                          type="button"
+                          class="ti-badge explain-badge"
+                          [ngClass]="getThreatBadgeClass(getThreatIntel(alert.destIp))"
+                          (click)="explainThreatIntel(alert.destIp, getThreatIntel(alert.destIp))"
+                        >
+                          {{ getThreatLabel(getThreatIntel(alert.destIp)) }}
+                        </button>
+                      </div>
+                    </td>
+                    <td>
+                      <button
+                        type="button"
+                        class="explain-chip"
+                        (click)="openExplain(alert.action, 'action', {
+                          signature: alert.signature,
+                          category: alert.category
+                        })"
+                      >
+                        {{ alert.action }}
+                      </button>
+                    </td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        </section>
+      }
+    </div>
+
+    @if (agentOpen()) {
+      <aside class="dashboard__agent">
+        <app-ask-agent
+          [initialIndicator]="agentIndicator()"
+          [initialType]="agentType()"
+          (closed)="closeAgent()"
+        />
+      </aside>
+    }
+  </div>
+
+  @if (explainOpen()) {
+    <app-ai-explain-popup
+      [term]="explainTerm()"
+      [kind]="explainKind()"
+      [context]="explainContext()"
+      (closed)="closeExplain()"
+    />
+  }
+</div>

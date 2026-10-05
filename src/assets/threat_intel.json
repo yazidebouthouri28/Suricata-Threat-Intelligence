@@ -1,0 +1,56 @@
+[
+  {
+    "indicator": "185.220.101.47",
+    "type": "ip",
+    "malicious": true,
+    "threat_source": "virustotal+urlhaus",
+    "confidence_score": 92,
+    "threat_categories": ["C2", "Botnet", "TorExitNode"],
+    "checked_at": "2026-07-27T10:00:00.000000Z"
+  },
+  {
+    "indicator": "45.33.32.156",
+    "type": "ip",
+    "malicious": true,
+    "threat_source": "virustotal",
+    "confidence_score": 78,
+    "threat_categories": ["Scanning", "Malware Distribution"],
+    "checked_at": "2026-07-27T10:00:00.000000Z"
+  },
+  {
+    "indicator": "80.82.77.139",
+    "type": "ip",
+    "malicious": true,
+    "threat_source": "urlhaus",
+    "confidence_score": 85,
+    "threat_categories": ["Phishing", "Exploit Kit"],
+    "checked_at": "2026-07-27T10:00:00.000000Z"
+  },
+  {
+    "indicator": "c2-botnet.ru",
+    "type": "domain",
+    "malicious": true,
+    "threat_source": "virustotal+urlhaus",
+    "confidence_score": 96,
+    "threat_categories": ["C2", "Botnet"],
+    "checked_at": "2026-07-27T10:00:00.000000Z"
+  },
+  {
+    "indicator": "malware-dist.net",
+    "type": "domain",
+    "malicious": true,
+    "threat_source": "virustotal",
+    "confidence_score": 81,
+    "threat_categories": ["Malware Distribution"],
+    "checked_at": "2026-07-27T10:00:00.000000Z"
+  },
+  {
+    "indicator": "phishing-kit.pw",
+    "type": "domain",
+    "malicious": true,
+    "threat_source": "urlhaus",
+    "confidence_score": 88,
+    "threat_categories": ["Phishing", "Credential Harvesting"],
+    "checked_at": "2026-07-27T10:00:00.000000Z"
+  }
+]

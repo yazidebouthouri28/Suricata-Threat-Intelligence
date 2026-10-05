@@ -1,0 +1,39 @@
+<div class="explain-backdrop" (click)="onBackdropClick($event)" role="presentation">
+  <div class="explain-popup" role="dialog" aria-modal="true" [attr.aria-label]="term()">
+    <header class="explain-popup__header">
+      <div>
+        <p class="explain-popup__eyebrow">✦ AI Explanation</p>
+        <h3>{{ term() }}</h3>
+      </div>
+      <button type="button" class="explain-popup__close" (click)="close()" aria-label="Close">
+        ✕
+      </button>
+    </header>
+
+    @if (loading()) {
+      <div class="explain-popup__loading">
+        <div class="explain-popup__spinner"></div>
+        <p>Analysing context…</p>
+      </div>
+    }
+
+    @if (error()) {
+      <div class="explain-popup__error">{{ error() }}</div>
+    }
+
+    @if (!loading() && explanation(); as result) {
+      <div class="explain-popup__body">
+        <p class="explain-popup__meta">
+          <span class="explain-popup__tag">{{ result.kind }}</span>
+          Generated {{ result.generatedAt | date: 'HH:mm:ss · dd MMM yyyy' }}
+        </p>
+
+        <div class="explain-popup__text">
+          @for (paragraph of result.explanation.split('\n\n'); track paragraph) {
+            <p>{{ paragraph }}</p>
+          }
+        </div>
+      </div>
+    }
+  </div>
+</div>

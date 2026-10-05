@@ -1,0 +1,44 @@
+[
+  {
+    "id": "report-nmap-recon-2026",
+    "title": "Nmap Reconnaissance Campaign",
+    "source": "Internal SOC Threat Report",
+    "content": "Recent campaigns use Nmap Scripting Engine user-agents against web and management ports (80, 8180, 443). Attackers fingerprint services before launching credential attacks or CVE exploits. Recommended actions: restrict management interfaces to VPN, enable geo-blocking, and alert on scanner user-agents.",
+    "keywords": ["nmap", "scan", "reconnaissance", "8180", "web application"]
+  },
+  {
+    "id": "report-credential-default-2026",
+    "title": "Default Credential Exploitation Trend",
+    "source": "CERT-FR Advisory",
+    "content": "Threat actors actively test default admin credentials on SOHO routers and CPE management interfaces (Zyxel, D-Link). Successful access leads to configuration changes and lateral movement. Immediate remediation: change all default passwords, disable remote admin, and patch firmware.",
+    "keywords": ["default credential", "brute force", "zyxel", "d-link", "admin"]
+  },
+  {
+    "id": "report-vpn-exploit-2026",
+    "title": "VPN and Edge Device Exploitation",
+    "source": "Mandiant Threat Intelligence",
+    "content": "Mass scanning for Citrix ADC (CVE-2019-19781), F5 BIG-IP (CVE-2020-5902), Fortinet FortiOS (CVE-2018-13379), and Cisco ASA (CVE-2020-3452) continues. Patch immediately, restrict admin panels, and monitor for path traversal in URI logs.",
+    "keywords": ["citrix", "f5", "fortinet", "cisco", "cve", "path traversal", "vpn", "exploit"]
+  },
+  {
+    "id": "report-ddos-amplification",
+    "title": "UDP Amplification and SSDP Abuse",
+    "source": "Cloudflare DDoS Report",
+    "content": "SSDP and other UDP amplification protocols are abused for reflection DDoS. A single spoofed query can generate large responses. Block SSDP on WAN interfaces, implement BCP38 egress filtering, and rate-limit UDP services.",
+    "keywords": ["ddos", "dos", "udp flood", "ssdp", "amplification"]
+  },
+  {
+    "id": "report-stream-anomalies",
+    "title": "TCP Stream Anomaly Detection",
+    "source": "Suricata IDS Best Practices",
+    "content": "Repeated SYN retransmissions with different sequence numbers and invalid TCP timestamps may indicate evasion, session hijacking attempts, or malformed traffic from scanning tools. Investigate source hosts generating high volumes of stream alerts and consider temporary blocking.",
+    "keywords": ["stream", "handshake", "syn", "mitm", "tcp", "protocol"]
+  },
+  {
+    "id": "report-c2-botnet",
+    "title": "Botnet C2 Infrastructure",
+    "source": "Abuse.ch Threat Feed",
+    "content": "Known C2 domains and IPs associated with botnets should be blocked at the firewall and DNS layer. Indicators include high-confidence VirusTotal scores, URLhaus listings, and categories such as C2, Botnet, or Tor exit nodes.",
+    "keywords": ["c2", "botnet", "malicious", "domain", "ip", "indicator"]
+  }
+]

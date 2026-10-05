@@ -7,10 +7,15 @@ import {
 import express from 'express';
 import { join } from 'node:path';
 
+import { createAgentRouter } from './api/routes/agent.routes';
+
 const browserDistFolder = join(import.meta.dirname, '../browser');
 
 const app = express();
 const angularApp = new AngularNodeAppEngine();
+
+app.use(express.json({ limit: '1mb' }));
+app.use('/api', createAgentRouter());
 
 /**
  * Example Express Rest API endpoints can be defined here.

@@ -1,0 +1,146 @@
+<section class="agent-panel">
+  <header class="agent-panel__header">
+    <div>
+      <p class="agent-panel__eyebrow">AI SOC Agent · RAG</p>
+      <h2>Ask Agent</h2>
+      <p class="agent-panel__subtitle">
+        Analyze an IP, domain, or hash using MITRE ATT&amp;CK and threat reports.
+      </p>
+    </div>
+    <button type="button" class="agent-panel__close" (click)="closePanel()" aria-label="Close">
+      ✕
+    </button>
+  </header>
+
+  @if (health(); as apiHealth) {
+    <div class="agent-panel__status">
+      <span>RAG index: {{ apiHealth.knowledgeDocuments }} documents</span>
+      <span>
+        LLM:
+        @if (apiHealth.llmConfigured) {
+          connected
+        } @else {
+          rule-based fallback (set OPENAI_API_KEY for GPT/Claude-compatible API)
+        }
+      </span>
+    </div>
+  } @else {
+    <div class="agent-panel__status agent-panel__status--warn">
+      Agent API not detected — run <code>npm run api</code> in another terminal.
+    </div>
+  }
+
+  <form class="agent-panel__form" (submit)="$event.preventDefault(); analyze()">
+    <label>
+      Indicator type
+      <select
+        [ngModel]="indicatorType()"
+        (ngModelChange)="onTypeChange($event)"
+        name="indicatorType"
+      >
+        <option value="ip">IP address</option>
+        <option value="domain">Domain</option>
+        <option value="hash">Hash (MD5/SHA256)</option>
+      </select>
+    </label>
+
+    <label>
+      Indicator
+      <input
+        type="text"
+        [ngModel]="indicatorValue()"
+        (ngModelChange)="indicatorValue.set($event)"
+        name="indicatorValue"
+        placeholder="e.g. 192.168.100.10"
+      />
+    </label>
+
+    @if (indicatorOptions().length) {
+      <div class="agent-panel__quick-picks">
+        <span>Quick select:</span>
+        @for (option of indicatorOptions(); track option) {
+          <button
+            type="button"
+            class="chip"
+            [class.chip--active]="indicatorValue() === option"
+            (click)="selectIndicator(option)"
+          >
+            {{ option }}
+          </button>
+        }
+      </div>
+    }
+
+    <button type="submit" class="agent-panel__submit" [disabled]="analyzing() || !indicatorValue().trim()">
+      @if (analyzing()) {
+        Analyzing…
+      } @else {
+        Ask Agent
+      }
+    </button>
+  </form>
+
+  @if (error()) {
+    <div class="agent-panel__error">{{ error() }}</div>
+  }
+
+  @if (result(); as analysis) {
+    <div class="agent-panel__results">
+      <article class="result-card">
+        <h3>Asset summary</h3>
+        <p>{{ analysis.summary }}</p>
+        <span class="result-card__meta">
+          Mode: {{ analysis.mode === 'llm' ? 'LLM + RAG' : 'Rules + RAG' }} ·
+          {{ analysis.generatedAt | date: 'medium' }}
+        </span>
+      </article>
+
+      <article class="result-card">
+        <h3>Indicators of compromise (IoCs)</h3>
+        @if (analysis.iocs.length) {
+          <ul>
+            @for (ioc of analysis.iocs; track ioc.type + ioc.value) {
+              <li>
+                <strong>{{ ioc.type }}</strong> · {{ ioc.value }}
+                <span>{{ ioc.description }}</span>
+              </li>
+            }
+          </ul>
+        } @else {
+          <p>No additional IoCs identified.</p>
+        }
+      </article>
+
+      <article class="result-card">
+        <h3>Remediation recommendations</h3>
+        <ol>
+          @for (step of analysis.remediation; track step) {
+            <li>{{ step }}</li>
+          }
+        </ol>
+      </article>
+
+      @if (analysis.mitreTechniques.length) {
+        <article class="result-card">
+          <h3>MITRE ATT&amp;CK techniques</h3>
+          <div class="tag-list">
+            @for (technique of analysis.mitreTechniques; track technique) {
+              <span class="tag">{{ technique }}</span>
+            }
+          </div>
+        </article>
+      }
+
+      <article class="result-card">
+        <h3>RAG sources (semantic search)</h3>
+        @for (source of analysis.ragSources; track source.id) {
+          <div class="source-item">
+            <strong>{{ source.title }}</strong>
+            <span>{{ source.source }} · score {{ source.score }}</span>
+            <p>{{ source.excerpt }}</p>
+          </div>
+        }
+      </article>
+    </div>
+  }
+</section>
